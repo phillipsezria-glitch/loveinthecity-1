@@ -73,21 +73,6 @@ export const DiscoverPage: React.FC = () => {
             </div>
           </div>
         ))}
-        {/* Fillers for UI demo */}
-         {discoverableUsers.map((user) => (
-          <div 
-            key={`${user.id}-duplicate`} 
-            onClick={() => navigate(`/user/${user.id}`)}
-            className="bg-secondary rounded-xl overflow-hidden relative shadow-md group active:scale-95 transition-transform cursor-pointer"
-          >
-             <div className="aspect-[3/4]">
-                <img src={user.images[1] || user.images[0]} alt={user.name} className="w-full h-full object-cover opacity-70 grayscale" />
-            </div>
-             <div className="absolute inset-0 flex items-center justify-center">
-                 <span className="bg-black/50 px-3 py-1 rounded-full text-xs border border-white/20">Offline</span>
-             </div>
-          </div>
-        ))}
       </div>
     </div>
   );

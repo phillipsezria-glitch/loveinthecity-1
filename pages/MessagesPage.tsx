@@ -11,6 +11,7 @@ export const MessagesPage: React.FC = () => {
     message: ''
   });
   const [copied, setCopied] = useState(false);
+  const [error, setError] = useState('');
 
   const telegramUrl = 'https://t.me/loveinthecity';
   const whatsappUrl = 'https://wa.me/1234567890';
@@ -22,6 +23,21 @@ export const MessagesPage: React.FC = () => {
   }`;
 
   const copyMessage = () => {
+    // Validate form
+    if (!formData.name.trim()) {
+      setError('❌ Please enter your name');
+      return;
+    }
+    if (!formData.email.trim()) {
+      setError('❌ Please enter your email');
+      return;
+    }
+    if (formData.issue === 'reserve' && !formData.selectedProfile) {
+      setError('❌ Please select a profile to reserve');
+      return;
+    }
+    
+    setError(''); // Clear error if validation passes
     navigator.clipboard.writeText(messagePreview);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);

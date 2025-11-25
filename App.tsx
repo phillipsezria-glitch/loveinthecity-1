@@ -32,21 +32,26 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
 export default function App() {
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
 
-  // Simulate session check
+  // Check authentication using StorageManager for consistency
   useEffect(() => {
-    const token = localStorage.getItem('funloves_token');
-    if (token) {
+    const storage = require('./utils/localStorage').StorageManager.getInstance();
+    const userSession = storage.get('userSession');
+    if (userSession && userSession.isAuthenticated) {
       setIsAuthenticated(true);
     }
   }, []);
 
   const handleLogin = () => {
+    // Both methods for compatibility, but primary is StorageManager
     localStorage.setItem('funloves_token', 'mock_jwt_token');
     setIsAuthenticated(true);
   };
 
   const handleLogout = () => {
+    // Clear both auth methods
     localStorage.removeItem('funloves_token');
+    const storage = require('./utils/localStorage').StorageManager.getInstance();
+    storage.clearUserProfile();
     setIsAuthenticated(false);
   };
 
