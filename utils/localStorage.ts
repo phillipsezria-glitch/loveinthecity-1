@@ -17,6 +17,25 @@ export interface StorageItem<T> {
   version: number;
 }
 
+export interface UserProfile {
+  id: string; // Unique user identifier for customer support
+  name: string;
+  email: string;
+  phone: string;
+  createdAt: string; // ISO timestamp when profile was created
+  lastLogin: string; // ISO timestamp of last login
+  preferences: {
+    ageRange?: [number, number];
+    location?: string;
+    interests?: string[];
+  };
+  supportMetadata: {
+    sessionCount: number;
+    totalVisits: number;
+    referralSource: string;
+  };
+}
+
 const STORAGE_VERSION = 1;
 const STORAGE_PREFIX = 'loveinthecity_';
 
@@ -217,6 +236,97 @@ export class StorageManager {
   }
 
   /**
+   * Create or update user profile with unique ID
+   */
+  createOrUpdateUserProfile(userData: Partial<UserProfile>): UserProfile {
+    const existingProfile = this.get<UserProfile>('userProfile');
+    
+    const profile: UserProfile = {
+      id: existingProfile?.id || this.generateUniqueUserId(),
+      name: userData.name || existingProfile?.name || 'User',
+      email: userData.email || existingProfile?.email || '',
+      phone: userData.phone || existingProfile?.phone || '',
+      createdAt: existingProfile?.createdAt || new Date().toISOString(),
+      lastLogin: new Date().toISOString(),
+      preferences: {
+        ...existingProfile?.preferences,
+        ...userData.preferences
+      },
+      supportMetadata: {
+        sessionCount: (existingProfile?.supportMetadata?.sessionCount || 0) + 1,
+        totalVisits: (existingProfile?.supportMetadata?.totalVisits || 0) + 1,
+        referralSource: userData.supportMetadata?.referralSource || existingProfile?.supportMetadata?.referralSource || 'direct'
+      }
+    };
+
+    this.set('userProfile', profile);
+    this.log(`👤 User profile ${profile.id} created/updated: ${profile.name}`);
+    return profile;
+  }
+
+  /**
+   * Get user profile with fallback
+   */
+  getUserProfile(): UserProfile | null {
+    const profile = this.get<UserProfile>('userProfile');
+    if (profile) {
+      this.log(`👤 Retrieved user profile: ${profile.id} (${profile.name})`);
+      return profile;
+    }
+    this.log('⚠️  No user profile found');
+    return null;
+  }
+
+  /**
+   * Generate unique user ID for customer support
+   */
+  private generateUniqueUserId(): string {
+    const timestamp = Date.now().toString(36); // Convert timestamp to base36
+    const random = Math.random().toString(36).substring(2, 9); // Random string
+    const userId = `user_${timestamp}_${random}`.toUpperCase();
+    this.log(`🆔 Generated unique user ID: ${userId}`);
+    return userId;
+  }
+
+  /**
+   * Get user ID for customer support reference
+   */
+  getUserId(): string {
+    const profile = this.getUserProfile();
+    if (profile?.id) {
+      return profile.id;
+    }
+    // Create default profile if none exists
+    const newProfile = this.createOrUpdateUserProfile({ name: 'Anonymous' });
+    return newProfile.id;
+  }
+
+  /**
+   * Get formatted user info for customer support
+   */
+  getUserInfoForSupport(): string {
+    const profile = this.getUserProfile();
+    if (!profile) {
+      return 'User ID: Unknown | Name: Anonymous';
+    }
+    return `User ID: ${profile.id} | Name: ${profile.name} | Email: ${profile.email || 'N/A'} | Created: ${new Date(profile.createdAt).toLocaleDateString()}`;
+  }
+
+  /**
+   * Clear user profile
+   */
+  clearUserProfile(): boolean {
+    try {
+      this.remove('userProfile');
+      this.log('👤 User profile cleared');
+      return true;
+    } catch (error) {
+      console.error('❌ Error clearing user profile:', error);
+      return false;
+    }
+  }
+
+  /**
    * Clear all app storage
    */
   clear(): boolean {
@@ -229,7 +339,7 @@ export class StorageManager {
         }
       });
       this.cache.clear();
-      console.log('🧹 All storage cleared');
+      this.log('🧹 All storage cleared');
       return true;
     } catch (error) {
       console.error('❌ Error clearing storage:', error);

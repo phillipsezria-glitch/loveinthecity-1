@@ -15,12 +15,18 @@ export interface SupportRequest {
   id: string;
   userId: string;
   userName: string;
+  userEmail: string;
   issueType: string;
-  source: string;
+  sourceUrl: string; // Exact referrer/source page
+  sourceType: string; // app, website, ads, referral, organic
   timestamp: string;
   userAgent: string;
   sessionId: string;
   context: Record<string, any>;
+  support: {
+    contactInfo: string;
+    preferredChannel: string;
+  };
 }
 
 export class DeepLinkManager {
@@ -98,6 +104,36 @@ export class DeepLinkManager {
   }
 
   /**
+   * Determine traffic source from referrer and URL parameters
+   */
+  private determineSourceType(): { sourceType: string; sourceUrl: string } {
+    const referrer = document.referrer;
+    const urlParams = new URLSearchParams(window.location.search);
+    const utmSource = urlParams.get('utm_source') || '';
+    const utmMedium = urlParams.get('utm_medium') || '';
+
+    let sourceType = 'organic'; // default
+
+    // Check UTM parameters first (highest priority)
+    if (utmMedium === 'paid' || utmSource?.includes('ads')) {
+      sourceType = 'ads';
+    } else if (utmSource === 'referral' || utmMedium === 'referral') {
+      sourceType = 'referral';
+    } else if (referrer && referrer.includes(window.location.hostname)) {
+      sourceType = 'app';
+    } else if (referrer && !referrer.includes('google') && !referrer.includes('facebook') && referrer.length > 0) {
+      sourceType = 'referral';
+    } else if (referrer && (referrer.includes('google') || referrer.includes('bing'))) {
+      sourceType = 'organic';
+    }
+
+    return {
+      sourceType,
+      sourceUrl: referrer || window.location.href
+    };
+  }
+
+  /**
    * Handle support request with rich context
    */
   private handleSupportRequest(params: Record<string, string>): void {
@@ -106,26 +142,44 @@ export class DeepLinkManager {
       return;
     }
 
+    const { sourceType, sourceUrl } = this.determineSourceType();
+
     const supportRequest: SupportRequest = {
       id: `req_${Date.now()}_${Math.random().toString(36).substr(2, 6)}`,
       userId: this.currentUser.id || 'unknown',
       userName: this.currentUser.name || 'Anonymous',
+      userEmail: this.currentUser.email || params.email || 'not-provided',
       issueType: params.issueType || 'general',
-      source: params.source || 'app',
+      sourceUrl: sourceUrl,
+      sourceType: sourceType,
       timestamp: new Date().toISOString(),
       userAgent: navigator.userAgent,
       sessionId: this.sessionId,
+      support: {
+        contactInfo: `${this.currentUser.email || 'no-email'} | ${this.currentUser.phone || 'no-phone'}`,
+        preferredChannel: params.channel || 'telegram'
+      },
       context: {
         ...this.getDeviceContext(),
         page: window.location.pathname,
         queryParams: params,
+        sourceTracking: {
+          referrer: document.referrer,
+          direct: !document.referrer,
+          utmSource: new URLSearchParams(window.location.search).get('utm_source'),
+          utmMedium: new URLSearchParams(window.location.search).get('utm_medium'),
+          utmCampaign: new URLSearchParams(window.location.search).get('utm_campaign')
+        },
         userProfile: {
           name: this.currentUser.name,
           age: this.currentUser.age,
+          email: this.currentUser.email,
+          phone: this.currentUser.phone,
           location: this.currentUser.residence,
           city: this.currentUser.city,
           state: this.currentUser.state,
-          tags: this.currentUser.tags
+          tags: this.currentUser.tags,
+          createdAt: this.currentUser.createdAt
         }
       }
     };
