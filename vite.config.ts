@@ -18,6 +18,24 @@ export default defineConfig(({ mode }) => {
         alias: {
           '@': path.resolve(__dirname, '.'),
         }
+      },
+      build: {
+        chunkSizeWarningLimit: 1000,
+        rollupOptions: {
+          output: {
+            manualChunks: {
+              'vendor': ['react', 'react-dom', 'react-router-dom'],
+              'framer': ['framer-motion'],
+              'icons': ['lucide-react'],
+              'pages-home': ['./pages/HomePage.tsx'],
+              'pages-discover': ['./pages/ChoosePage.tsx', './pages/CommunityPage.tsx'],
+              'pages-messaging': ['./pages/MessagesPage.tsx'],
+              'pages-hotel': ['./pages/HotelPage.tsx'],
+              'pages-auth': ['./pages/LoginPage.tsx', './pages/SignupPage.tsx'],
+              'pages-profile': ['./pages/MinePage.tsx', './pages/UserProfilePage.tsx', './pages/VipPage.tsx']
+            }
+          }
+        }
       }
     };
 });

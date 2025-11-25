@@ -1,11 +1,27 @@
 import React, { useState, useEffect } from 'react';
-import { useLocation } from 'react-router-dom';
-import { MessageCircle } from 'lucide-react';
+import { useLocation, useNavigate } from 'react-router-dom';
+import { MessageCircle, Send, ArrowLeft } from 'lucide-react';
 import { MOCK_USERS } from '../constants';
 import { StorageManager } from '../utils/localStorage';
 
+// Issue type descriptions and styling
+const ISSUE_CONFIG = {
+  inquiry: { label: 'General Inquiry', color: 'blue', icon: '💬' },
+  reserve: { label: 'Reserve a Profile', color: 'red', icon: '❤️' },
+  support: { label: 'Support 24/7', color: 'green', icon: '📞' },
+  vip: { label: 'VIP Upgrade & Billing', color: 'purple', icon: '👑' },
+  password: { label: 'Login Password', color: 'orange', icon: '🔐' },
+  verification: { label: 'Account Verification', color: 'yellow', icon: '✓' },
+  report: { label: 'Report a User', color: 'red', icon: '⚠️' },
+  videos: { label: 'Private Videos', color: 'pink', icon: '🎥' },
+  pin: { label: 'Payment PIN', color: 'purple', icon: '🛡️' },
+  funding: { label: 'Funding Details', color: 'orange', icon: '💰' },
+  announcements: { label: 'Announcements', color: 'yellow', icon: '📢' }
+};
+
 export const MessagesPage: React.FC = () => {
   const location = useLocation();
+  const navigate = useNavigate();
   const storage = StorageManager.getInstance();
   
   // Get user profile and URL parameters
@@ -24,17 +40,31 @@ export const MessagesPage: React.FC = () => {
   const [copied, setCopied] = useState(false);
   const [error, setError] = useState('');
   
-  // Prefill form when component mounts
+  // Debug log for prefilled data
   useEffect(() => {
-    if (partnerId || issueType !== 'inquiry') {
-      setFormData(prev => ({
-        ...prev,
-        selectedProfile: partnerId || prev.selectedProfile,
-        issue: issueType || prev.issue,
-        name: userProfile?.name || prev.name,
-        phone: userProfile?.phone || prev.phone
-      }));
-    }
+    console.log('📨 MessagesPage Loaded - Initial Data:');
+    console.log('   URL Params: { issue:', issueType, ', partnerId:', partnerId, '}');
+    console.log('   User Profile:', userProfile);
+    console.log('   MOCK_USERS find result:', MOCK_USERS.find(u => u.id === partnerId));
+  }, []);
+  
+  // Prefill form when URL params or user profile change
+  useEffect(() => {
+    console.log('🔄 Prefill Effect Triggered:');
+    console.log('   issueType:', issueType);
+    console.log('   partnerId:', partnerId);
+    console.log('   userProfile:', userProfile);
+    
+    const newFormData = {
+      name: userProfile?.name || '',
+      phone: userProfile?.phone || '',
+      issue: issueType,
+      selectedProfile: partnerId || '',
+      message: ''
+    };
+    
+    setFormData(newFormData);
+    console.log('✅ Form updated with:', newFormData);
   }, [partnerId, issueType, userProfile]);
 
   const telegramUrl = 'https://t.me/loveinthecity';
@@ -77,18 +107,66 @@ export const MessagesPage: React.FC = () => {
 
   return (
     <div className="min-h-full bg-gradient-to-b from-white to-gray-50 pb-20 font-sans text-gray-900">
-      <div className="max-w-2xl mx-auto px-4 py-8">
-        {/* Header */}
-        <div className="text-center mb-8">
-          <div className="flex items-center justify-center gap-2 mb-4">
-            <MessageCircle size={32} className="text-primary" />
-            <h1 className="text-3xl font-bold">Contact Us</h1>
-          </div>
-          <p className="text-gray-600 text-sm">Connect with our team via Telegram or WhatsApp to reserve your match!</p>
+      <div className="max-w-2xl mx-auto px-4 py-6">
+        {/* Back Button Header */}
+        <div className="flex items-center gap-3 mb-8">
+          <button
+            onClick={() => navigate(-1)}
+            className="p-2 hover:bg-gray-100 rounded-full transition-colors active:scale-95"
+            aria-label="Go back"
+          >
+            <ArrowLeft size={24} className="text-gray-700" />
+          </button>
+          <h1 className="text-2xl font-bold text-gray-900">Contact Support</h1>
         </div>
+
+        {/* Issue Type Banner */}
+        {issueType !== 'inquiry' && (() => {
+          const config = ISSUE_CONFIG[issueType as keyof typeof ISSUE_CONFIG] || ISSUE_CONFIG.inquiry;
+          const colorMap: Record<string, string> = {
+            blue: 'bg-blue-50 border-blue-200',
+            red: 'bg-red-50 border-red-200',
+            green: 'bg-green-50 border-green-200',
+            purple: 'bg-purple-50 border-purple-200',
+            orange: 'bg-orange-50 border-orange-200',
+            yellow: 'bg-yellow-50 border-yellow-200',
+            pink: 'bg-pink-50 border-pink-200'
+          };
+          const textColorMap: Record<string, string> = {
+            blue: 'text-blue-700',
+            red: 'text-red-700',
+            green: 'text-green-700',
+            purple: 'text-purple-700',
+            orange: 'text-orange-700',
+            yellow: 'text-yellow-700',
+            pink: 'text-pink-700'
+          };
+          return (
+            <div className={`${colorMap[config.color as keyof typeof colorMap]} border-2 rounded-xl p-4 mb-6 flex items-center gap-3`}>
+              <span className="text-2xl">{config.icon}</span>
+              <div>
+                <p className={`font-bold ${textColorMap[config.color as keyof typeof textColorMap]}`}>{config.label}</p>
+                <p className="text-xs text-gray-600">Request Type: {issueType}</p>
+              </div>
+            </div>
+          );
+        })()}
 
         {/* Contact Form */}
         <div className="bg-white rounded-2xl shadow-lg p-6 mb-6 border border-gray-200">
+          {/* Debug Panel - Shows prefilled data */}
+          <div className="mb-6 p-3 bg-gray-50 border border-gray-200 rounded-lg text-xs font-mono">
+            <p className="font-bold text-gray-700 mb-2">📋 Form State:</p>
+            <p className="text-gray-600">Issue: <span className="text-gray-900 font-bold">{formData.issue}</span></p>
+            <p className="text-gray-600">Profile ID: <span className="text-gray-900 font-bold">{formData.selectedProfile || 'none'}</span></p>
+            <p className="text-gray-600">Profile Name: <span className="text-gray-900 font-bold">{MOCK_USERS.find(u => u.id === formData.selectedProfile)?.name || 'N/A'}</span></p>
+            <p className="text-gray-600">Your Name: <span className="text-gray-900 font-bold">{formData.name || 'empty'}</span></p>
+          </div>
+
+          {/* Description */}
+          <p className="text-gray-600 text-sm mb-6 pb-4 border-b border-gray-100">
+            Connect with our team via Telegram or WhatsApp to reserve your match!
+          </p>
           {/* Name & Phone */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
             <div>
@@ -128,6 +206,10 @@ export const MessagesPage: React.FC = () => {
               <option value="password">Password Reset</option>
               <option value="verification">Account Verification</option>
               <option value="report">Report a User</option>
+              <option value="videos">Private Videos</option>
+              <option value="pin">Payment PIN</option>
+              <option value="funding">Funding Details</option>
+              <option value="announcements">Announcements</option>
             </select>
           </div>
 

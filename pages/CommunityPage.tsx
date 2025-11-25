@@ -12,8 +12,8 @@ export const CommunityPage: React.FC = () => {
 
       {/* Feed */}
       <div className="p-4 space-y-5">
-        {SUCCESS_STORIES.map(post => (
-            <div key={post.id} className="bg-white rounded-2xl overflow-hidden shadow-soft border border-gray-100">
+        {SUCCESS_STORIES.map((post, index) => (
+            <div key={`story-${post.id}-${index}`} className="bg-white rounded-2xl overflow-hidden shadow-soft border border-gray-100">
                 <div className="p-4">
                     <div className="flex items-center mb-3">
                         <div className="w-8 h-8 rounded-full bg-pink-100 flex items-center justify-center text-primary mr-3">

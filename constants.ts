@@ -552,7 +552,7 @@ export const MOCK_USERS: User[] = [
       'https://ushoutai.truelovecity.com/upload/e6a7f648b22bd23c/de564aeddef4de54.jpg'
     ],
     isVip: false,
-    tags: ['Youâ€™re not just my love; youâ€™re my destiny.', 'Youâ€™re not just my love; youâ€™re my destiny.'],
+    tags: ['Youâ€™re not just my love; youâ€™re my destiny.', 'Forever with you.'],
     height: '165cm',
     bust: '55',
     serviceCity: 'USA',

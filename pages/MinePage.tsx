@@ -1,21 +1,82 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { MOCK_USERS } from '../constants';
-import { Phone, RefreshCw, Video, Lock, ShieldCheck, FileText, Bell, LogOut, ChevronRight } from 'lucide-react';
+import { Phone, RefreshCw, Video, Lock, ShieldCheck, FileText, Bell, LogOut, ChevronRight, Copy, Check } from 'lucide-react';
+import { StorageManager } from '../utils/localStorage';
 
 interface MinePageProps {
     onLogout: () => void;
 }
 
+interface UserProfile {
+  id: string;
+  name: string;
+  phone?: string;
+  [key: string]: any;
+}
+
 export const MinePage: React.FC<MinePageProps> = ({ onLogout }) => {
   const navigate = useNavigate();
-  // Using a mock user for the profile
-  const me = {
-      id: 'me',
-      creditScore: 80,
-      points: 0.00,
-      phone: '123456123456'
+  const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
+  const [copiedId, setCopiedId] = useState(false);
+
+  // Load user profile on component mount
+  useEffect(() => {
+    console.log('📋 MinePage: Fetching user profile...');
+    const storage = StorageManager.getInstance();
+    const profile = storage.getUserProfile();
+    
+    if (profile) {
+      console.log('✅ MinePage: User profile loaded:', profile);
+      setUserProfile(profile);
+    } else {
+      console.log('⚠️  MinePage: No user profile found');
+    }
+  }, []);
+
+  // Prefill function - generates user summary
+  const prefillUserData = () => {
+    if (!userProfile) {
+      console.log('⚠️  No user profile to prefill');
+      return null;
+    }
+
+    const userSummary = {
+      userId: userProfile.id,
+      name: userProfile.name,
+      phone: userProfile.phone,
+      city: userProfile.preferences?.location || 'Not specified',
+      joinDate: new Date(userProfile.createdAt).toLocaleDateString(),
+      lastActive: new Date(userProfile.lastLogin).toLocaleDateString(),
+      sessionCount: userProfile.supportMetadata?.sessionCount || 1,
+      totalVisits: userProfile.supportMetadata?.totalVisits || 1,
+      referralSource: userProfile.supportMetadata?.referralSource || 'organic'
+    };
+
+    console.log('📊 MinePage Prefilled User Data:', userSummary);
+    return userSummary;
   };
+
+  const userSummary = prefillUserData();
+
+  const copyToClipboard = (text: string) => {
+    navigator.clipboard.writeText(text);
+    setCopiedId(true);
+    setTimeout(() => setCopiedId(false), 2000);
+    console.log('📋 Copied to clipboard:', text);
+  };
+
+  // Fallback to mock data if no profile
+  const me = userProfile || {
+      id: 'USER-UNKNOWN',
+      name: 'Guest User',
+      phone: 'Not provided',
+      creditScore: 80,
+      points: 0.00
+  };
+
+  const creditScore = 80;
+  const points = 0.00;
 
   return (
     <div className="min-h-full bg-gray-50 pb-20 relative font-sans text-gray-900">
@@ -23,13 +84,23 @@ export const MinePage: React.FC<MinePageProps> = ({ onLogout }) => {
         <div className="bg-white pb-6 pt-8 px-6 shadow-sm rounded-b-[2rem]">
              <div className="flex items-center">
                  <div className="w-20 h-20 rounded-full overflow-hidden border-2 border-primary p-0.5 mr-4 shadow-md">
-                    <img src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?q=80&w=200&auto=format&fit=crop" alt="Me" className="w-full h-full object-cover rounded-full" />
+                    <img src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?q=80&w=200&auto=format&fit=crop" alt={me.name} className="w-full h-full object-cover rounded-full" />
                  </div>
                  <div className="flex-1">
-                     <div className="text-xl font-bold text-gray-900 mb-1">{me.phone}</div>
+                     <div className="text-xl font-bold text-gray-900 mb-1">{me.name}</div>
+                     <div className="text-xs text-gray-500 mb-2 font-mono bg-gray-50 px-2 py-1 rounded border border-gray-200 flex items-center justify-between group">
+                       <span>ID: {me.id}</span>
+                       <button 
+                         onClick={() => copyToClipboard(me.id)}
+                         className="ml-2 p-1 hover:bg-gray-200 rounded opacity-0 group-hover:opacity-100 transition-opacity"
+                         title="Copy ID"
+                       >
+                         {copiedId ? <Check size={14} className="text-green-600" /> : <Copy size={14} />}
+                       </button>
+                     </div>
                      <div className="flex items-center space-x-2">
                         <span className="text-xs font-medium text-white bg-primary px-2 py-0.5 rounded-full">VIP Member</span>
-                        <span className="text-xs text-gray-500 bg-gray-100 px-2 py-0.5 rounded-full border border-gray-200">Score: {me.creditScore}</span>
+                        <span className="text-xs text-gray-500 bg-gray-100 px-2 py-0.5 rounded-full border border-gray-200">Score: {creditScore}</span>
                      </div>
                  </div>
                  <div className="bg-[#25D366] rounded-full p-2 text-white shadow-md">
@@ -47,7 +118,7 @@ export const MinePage: React.FC<MinePageProps> = ({ onLogout }) => {
                 <div className="flex justify-between items-start mb-2 relative z-10">
                     <div>
                         <span className="text-xs text-gray-400 uppercase tracking-wider font-medium">Points Balance</span>
-                        <div className="text-4xl font-bold mt-1">{me.points.toFixed(2)}</div>
+                        <div className="text-4xl font-bold mt-1">{points.toFixed(2)}</div>
                     </div>
                     <button className="bg-white/20 hover:bg-white/30 transition text-white text-xs font-bold px-3 py-1.5 rounded-lg flex items-center">
                         Redeem <ChevronRight size={12} className="ml-1" />
@@ -55,20 +126,51 @@ export const MinePage: React.FC<MinePageProps> = ({ onLogout }) => {
                 </div>
             </div>
 
+            {/* User Activity Summary */}
+            {userSummary && (
+              <div className="bg-white rounded-2xl p-4 shadow-soft border border-gray-100 mb-6">
+                <h3 className="text-sm font-bold text-gray-900 mb-4 flex items-center">
+                  <span className="text-lg mr-2">📊</span> Account Activity
+                </h3>
+                <div className="grid grid-cols-2 gap-3">
+                  <div className="bg-blue-50 border border-blue-100 rounded-lg p-3">
+                    <p className="text-xs text-gray-600 font-medium">Member Since</p>
+                    <p className="text-sm font-bold text-gray-900 mt-1">{userSummary.joinDate}</p>
+                  </div>
+                  <div className="bg-green-50 border border-green-100 rounded-lg p-3">
+                    <p className="text-xs text-gray-600 font-medium">Last Active</p>
+                    <p className="text-sm font-bold text-gray-900 mt-1">{userSummary.lastActive}</p>
+                  </div>
+                  <div className="bg-purple-50 border border-purple-100 rounded-lg p-3">
+                    <p className="text-xs text-gray-600 font-medium">Sessions</p>
+                    <p className="text-sm font-bold text-gray-900 mt-1">{userSummary.sessionCount}</p>
+                  </div>
+                  <div className="bg-orange-50 border border-orange-100 rounded-lg p-3">
+                    <p className="text-xs text-gray-600 font-medium">Total Visits</p>
+                    <p className="text-sm font-bold text-gray-900 mt-1">{userSummary.totalVisits}</p>
+                  </div>
+                  <div className="bg-gray-50 border border-gray-200 rounded-lg p-3 col-span-2">
+                    <p className="text-xs text-gray-600 font-medium">Location</p>
+                    <p className="text-sm font-bold text-gray-900 mt-1">📍 {userSummary.city}</p>
+                  </div>
+                </div>
+              </div>
+            )}
+
             {/* Grid Menu */}
             <h3 className="text-gray-900 font-bold mb-3 ml-1">Services</h3>
             <div className="bg-white rounded-2xl p-4 grid grid-cols-3 gap-y-6 shadow-soft border border-gray-100 mb-6">
                 {[
-                    { icon: Video, label: 'Private Videos', color: 'text-pink-500', bg: 'bg-pink-50' },
-                    { icon: Lock, label: 'Login Password', color: 'text-blue-500', bg: 'bg-blue-50' },
-                    { icon: ShieldCheck, label: 'Payment PIN', color: 'text-purple-500', bg: 'bg-purple-50' },
-                    { icon: FileText, label: 'Funding Details', color: 'text-orange-500', bg: 'bg-orange-50' },
-                    { icon: Bell, label: 'Announcements', color: 'text-yellow-500', bg: 'bg-yellow-50' },
-                    { icon: Phone, label: 'Support 24/7', color: 'text-green-500', bg: 'bg-green-50' },
+                    { icon: Video, label: 'Private Videos', color: 'text-pink-500', bg: 'bg-pink-50', issue: 'videos' },
+                    { icon: Lock, label: 'Login Password', color: 'text-blue-500', bg: 'bg-blue-50', issue: 'password' },
+                    { icon: ShieldCheck, label: 'Payment PIN', color: 'text-purple-500', bg: 'bg-purple-50', issue: 'pin' },
+                    { icon: FileText, label: 'Funding Details', color: 'text-orange-500', bg: 'bg-orange-50', issue: 'funding' },
+                    { icon: Bell, label: 'Announcements', color: 'text-yellow-500', bg: 'bg-yellow-50', issue: 'announcements' },
+                    { icon: Phone, label: 'Support 24/7', color: 'text-green-500', bg: 'bg-green-50', issue: 'support' },
                 ].map((item, i) => (
                     <button 
                         key={i} 
-                        onClick={() => navigate('/messages')}
+                        onClick={() => navigate(`/messages?issue=${item.issue}`)}
                         className="flex flex-col items-center justify-center space-y-2 cursor-pointer group"
                     >
                         <div className={`w-12 h-12 rounded-xl ${item.bg} flex items-center justify-center transition-transform group-active:scale-95 hover:shadow-md`}>

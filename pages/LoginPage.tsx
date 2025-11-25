@@ -1,17 +1,18 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Heart, Phone, ArrowRight, AlertCircle } from 'lucide-react';
-import { StorageManager } from '../utils/localStorage';
+import { simpleStorage } from '../utils/storageSimple';
 
 interface LoginPageProps {
   onLogin: () => void;
 }
 
 export const LoginPage: React.FC<LoginPageProps> = ({ onLogin }) => {
+  const navigate = useNavigate();
   const [phone, setPhone] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
-  const storage = StorageManager.getInstance();
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -32,37 +33,45 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onLogin }) => {
         return;
       }
 
-      // Simulate authentication
+      // Get user profile
       console.log('🔐 Authenticating user:', phone);
       
-      // Create user session
+      const userProfile = simpleStorage.get('userProfile');
+      if (!userProfile) {
+        setError('❌ Account not found. Please create an account first.');
+        setLoading(false);
+        console.log('❌ No user profile found in storage');
+        return;
+      }
+
+      // Check if phone matches
+      if (userProfile.phone !== phone) {
+        setError('❌ Phone number does not match any account');
+        setLoading(false);
+        console.log('❌ Phone mismatch:', { attempted: phone, stored: userProfile.phone });
+        return;
+      }
+
+      // Check if password matches
+      if (userProfile.password !== password) {
+        setError('❌ Invalid password');
+        setLoading(false);
+        console.log('❌ Password mismatch for user:', phone);
+        return;
+      }
+
+      console.log('✅ Credentials verified for:', phone);
       const userSession = {
-        id: 'user_' + Math.random().toString(36).substr(2, 9),
+        id: userProfile.userId,
         phone,
         isAuthenticated: true,
         loginTime: new Date().toISOString(),
         lastActive: Date.now()
       };
 
-      // Store session (1 day TTL)
-      const sessionTTL = 24 * 60 * 60 * 1000; // 24 hours
-      storage.set('userSession', userSession, sessionTTL);
+      // Store session
+      simpleStorage.set('userSession', userSession);
       
-      // Create default profile if not exists
-      const userProfile = storage.get('userProfile');
-      if (!userProfile) {
-        storage.set('userProfile', {
-          id: userSession.id,
-          name: 'User',
-          age: 25,
-          avatar: `https://api.dicebear.com/7.x/avataaars/svg?seed=${phone}`,
-          isVip: false,
-          following: 0,
-          fans: 0,
-          wallet: 0
-        });
-      }
-
       console.log('✅ Login successful for:', phone);
       setLoading(false);
       onLogin();
@@ -150,7 +159,13 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onLogin }) => {
 
         {/* Footer Actions */}
         <div className="mt-8 flex flex-col items-center space-y-4">
-            <button className="text-white font-bold text-sm bg-white/20 px-6 py-2 rounded-full hover:bg-white/30 transition backdrop-blur-md">
+            <button 
+              type="button"
+              onClick={() => {
+                console.log('🔵 Create Account button clicked');
+                navigate('/signup');
+              }}
+              className="text-white font-bold text-sm bg-white/20 px-6 py-2 rounded-full hover:bg-white/30 transition backdrop-blur-md">
                 Create New Account
             </button>
             

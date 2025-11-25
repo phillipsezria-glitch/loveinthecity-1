@@ -73,8 +73,16 @@ export const HomePage: React.FC = () => {
         <div className="flex overflow-x-auto space-x-3 pb-4 scrollbar-hide pr-4">
             {highEndUsers.map(user => (
                 <div key={user.id} className="flex-shrink-0 w-24 relative group cursor-pointer" onClick={() => navigate(`/user/${user.id}`)}>
-                    <div className="w-24 h-24 rounded-full overflow-hidden relative border-2 border-transparent group-hover:border-primary transition-all shadow-md">
-                        <img src={user.images[0]} alt={user.name} className="w-full h-full object-cover" />
+                    <div className="w-24 h-24 rounded-full overflow-hidden relative border-2 border-transparent group-hover:border-primary transition-all shadow-md bg-gray-200">
+                        <img 
+                          src={user.images[0]} 
+                          alt={user.name} 
+                          className="w-full h-full object-cover"
+                          onError={(e) => {
+                            const target = e.target as HTMLImageElement;
+                            target.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(user.name)}&background=ff6b6b&color=fff&size=96`;
+                          }}
+                        />
                     </div>
                     <div className="absolute -bottom-1 left-1/2 transform -translate-x-1/2 bg-primary text-white text-[9px] font-bold px-2 py-0.5 rounded-full shadow-sm">
                         Verified
@@ -95,8 +103,16 @@ export const HomePage: React.FC = () => {
             {recommendedUsers.map(user => (
                 <div key={user.id} className="bg-white rounded-2xl p-3 flex shadow-soft active:scale-98 transition-transform border border-gray-100 cursor-pointer" onClick={() => navigate(`/user/${user.id}`)}>
                     {/* Image */}
-                    <div className="w-24 h-28 flex-shrink-0 relative mr-3">
-                        <img src={user.images[0]} alt={user.name} className="w-full h-full object-cover rounded-xl" />
+                    <div className="w-24 h-28 flex-shrink-0 relative mr-3 bg-gray-200 rounded-xl overflow-hidden">
+                        <img 
+                          src={user.images[0]} 
+                          alt={user.name} 
+                          className="w-full h-full object-cover rounded-xl"
+                          onError={(e) => {
+                            const target = e.target as HTMLImageElement;
+                            target.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(user.name)}&background=ff6b6b&color=fff&size=192`;
+                          }}
+                        />
                         <div className="absolute top-1 left-1 bg-black/50 backdrop-blur text-white text-[8px] font-bold px-1.5 py-0.5 rounded">New</div>
                     </div>
 

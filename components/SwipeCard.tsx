@@ -52,6 +52,10 @@ export const SwipeCard: React.FC<SwipeCardProps> = ({ user, onSwipe, active }) =
           src={user.images[0]}
           alt={user.name}
           className="w-full h-full object-cover pointer-events-none"
+          onError={(e) => {
+            const target = e.target as HTMLImageElement;
+            target.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(user.name)}&background=ff6b6b&color=fff&size=500`;
+          }}
         />
 
         {/* Gradient Overlay */}
