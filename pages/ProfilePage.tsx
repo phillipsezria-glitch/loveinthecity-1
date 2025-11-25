@@ -139,7 +139,7 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({ onLogout }) => {
             { icon: CreditCard, label: 'Bank Cards', value: '2 Cards', path: null },
             { icon: Gift, label: 'Rewards & Games', value: 'Play', path: null },
             { icon: Crown, label: 'Member Center', value: 'Level 2', path: '/vip' },
-            { icon: Headset, label: 'Customer Service', value: '24/7', path: '/messages' },
+            { icon: Headset, label: 'Customer Service', value: '24/7', path: '/messages?issue=support' },
         ].map((item, i) => (
             <button 
                 key={i} 

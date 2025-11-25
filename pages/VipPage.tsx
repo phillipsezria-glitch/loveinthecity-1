@@ -181,7 +181,7 @@ export const VipPage: React.FC = () => {
                         <button 
                             onClick={() => {
                                 setShowSupportModal(false);
-                                navigate('/messages');
+                                navigate('/messages?issue=vip');
                             }}
                             className="w-full py-3.5 rounded-xl font-bold text-white bg-primary hover:bg-primary/90 transition shadow-lg shadow-primary/25 mb-3"
                         >

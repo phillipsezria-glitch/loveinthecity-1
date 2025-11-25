@@ -14,7 +14,7 @@ export const MOCK_USERS: User[] = [
   {
     id: '1',
     name: 'Grace',
-    age: 65,
+    age: 35,
     distance: 1,
     bio: 'I\'m an American girl who loves painting, poetry, and deep emotions. I believe every heart hides a story — maybe you and I can write the next chapter together.',
     images: [
@@ -36,7 +36,7 @@ export const MOCK_USERS: User[] = [
   {
     id: '2',
     name: 'Bella',
-    age: 65,
+    age: 32,
     distance: 2,
     bio: 'American girl here! Music is my daily therapy — I love singing, playing instruments, and dancing around the kitchen. Want to be my favorite tune?',
     images: [
@@ -58,7 +58,7 @@ export const MOCK_USERS: User[] = [
   {
     id: '3',
     name: 'Rose',
-    age: 65,
+    age: 38,
     distance: 3,
     bio: 'I\'m American, and I live for travel, growth, and deep emotional bonds. Let\'s skip the small talk and talk about life, dreams, and maybe love.',
     images: [
@@ -80,7 +80,7 @@ export const MOCK_USERS: User[] = [
   {
     id: '4',
     name: 'Scarlett',
-    age: 65,
+    age: 34,
     distance: 4,
     bio: 'From the United States. I enjoy flowers, pretty dresses, and holding hands. I\'m the type who still believes in handwritten letters and real dates.',
     images: [
@@ -102,7 +102,7 @@ export const MOCK_USERS: User[] = [
   {
     id: '5',
     name: 'Anna',
-    age: 65,
+    age: 36,
     distance: 5,
     bio: 'I\'m not perfect, but I\'m real. I don\'t need a perfect man, just one who\'s true to his heart.',
     images: [
@@ -124,7 +124,7 @@ export const MOCK_USERS: User[] = [
   {
     id: '6',
     name: 'Chloe',
-    age: 65,
+    age: 33,
     distance: 6,
     bio: 'Looking for someone who wants deep conversations, silly laughs, and something that lasts.',
     images: [
@@ -146,7 +146,7 @@ export const MOCK_USERS: User[] = [
   {
     id: '7',
     name: 'Ava',
-    age: 57,
+    age: 37,
     distance: 7,
     bio: 'A little shy at first, but once I open up — you\'ll see my heart is pure and full of love.',
     images: [
@@ -168,7 +168,7 @@ export const MOCK_USERS: User[] = [
   {
     id: '8',
     name: 'Olivia',
-    age: 57,
+    age: 39,
     distance: 8,
     bio: 'I want something real, soft, steady — a slow burn kind of love. Not a firework that fades.',
     images: [
@@ -190,7 +190,7 @@ export const MOCK_USERS: User[] = [
   {
     id: '9',
     name: 'Sophie',
-    age: 56,
+    age: 31,
     distance: 9,
     bio: 'I laugh loud, love deep, and never fake feelings. What you see is what you get.',
     images: [
@@ -212,7 +212,7 @@ export const MOCK_USERS: User[] = [
   {
     id: '10',
     name: 'Emily',
-    age: 57,
+    age: 40,
     distance: 10,
     bio: 'I love simple things: morning coffee, long hugs, and someone who really listens.',
     images: [
@@ -234,7 +234,7 @@ export const MOCK_USERS: User[] = [
   {
     id: '11',
     name: 'Selina',
-    age: 58,
+    age: 42,
     distance: 11,
     bio: 'Your love is the spark that lights up my life',
     images: [
@@ -256,7 +256,7 @@ export const MOCK_USERS: User[] = [
   {
     id: '12',
     name: 'Bianca',
-    age: 56,
+    age: 41,
     distance: 12,
     bio: 'With you, I\'ve found a love worth fighting for.',
     images: [
@@ -278,7 +278,7 @@ export const MOCK_USERS: User[] = [
   {
     id: '13',
     name: 'Serena',
-    age: 58,
+    age: 43,
     distance: 13,
     bio: 'You are my every reason, every hope, and every dream',
     images: [
@@ -300,7 +300,7 @@ export const MOCK_USERS: User[] = [
   {
     id: '14',
     name: 'Sophia',
-    age: 55,
+    age: 30,
     distance: 14,
     bio: 'Your smile is my favorite sunrise',
     images: [
@@ -322,7 +322,7 @@ export const MOCK_USERS: User[] = [
   {
     id: '15',
     name: 'Liliana',
-    age: 56,
+    age: 44,
     distance: 15,
     bio: 'In your eyes, I see my future.',
     images: [
@@ -344,7 +344,7 @@ export const MOCK_USERS: User[] = [
   {
     id: '16',
     name: 'Mia',
-    age: 52,
+    age: 45,
     distance: 16,
     bio: 'I want something real, soft, steady — a slow burn kind of love. Not a firework that fades.',
     images: [
@@ -366,7 +366,7 @@ export const MOCK_USERS: User[] = [
   {
     id: '17',
     name: 'Hannah',
-    age: 55,
+    age: 35,
     distance: 17,
     bio: 'My love language? Consistency, attention, and a little teasing.',
     images: [
@@ -388,7 +388,7 @@ export const MOCK_USERS: User[] = [
   {
     id: '18',
     name: 'Camila',
-    age: 58,
+    age: 38,
     distance: 18,
     bio: 'You are my heart\'s most beautiful song',
     images: [
@@ -410,7 +410,7 @@ export const MOCK_USERS: User[] = [
   {
     id: '19',
     name: 'Madison',
-    age: 68,
+    age: 41,
     distance: 19,
     bio: 'I\'m not distant, just saving my heart for someone real.',
     images: [
@@ -432,7 +432,7 @@ export const MOCK_USERS: User[] = [
   {
     id: '20',
     name: 'Isla',
-    age: 57,
+    age: 32,
     distance: 20,
     bio: 'Im yours, always and in all ways',
     images: [
@@ -454,7 +454,7 @@ export const MOCK_USERS: User[] = [
   {
     id: '21',
     name: 'Savannah',
-    age: 55,
+    age: 39,
     distance: 21,
     bio: 'You are the missing piece of my heart\'s puzzle.',
     images: [
@@ -476,7 +476,7 @@ export const MOCK_USERS: User[] = [
   {
     id: '22',
     name: 'Esmeralda',
-    age: 57,
+    age: 33,
     distance: 22,
     bio: 'I choose you today, tomorrow, and every day after.',
     images: [
@@ -498,7 +498,7 @@ export const MOCK_USERS: User[] = [
   {
     id: '23',
     name: 'Natalie',
-    age: 55,
+    age: 42,
     distance: 23,
     bio: 'Interesting souls deserve slow, genuine connection.',
     images: [
@@ -520,7 +520,7 @@ export const MOCK_USERS: User[] = [
   {
     id: '24',
     name: 'Adriana',
-    age: 53,
+    age: 36,
     distance: 24,
     bio: 'With you, love feels like magic.',
     images: [
@@ -542,7 +542,7 @@ export const MOCK_USERS: User[] = [
   {
     id: '25',
     name: 'Kate',
-    age: 55,
+    age: 43,
     distance: 25,
     bio: 'Love isn\'t fast food — I believe in slow, meaningful connection.',
     images: [
@@ -564,7 +564,7 @@ export const MOCK_USERS: User[] = [
   {
     id: '26',
     name: 'Scarlett',
-    age: 53,
+    age: 37,
     distance: 26,
     bio: 'Your love runs through my veins like wildfire—I\'m forever yours',
     images: [
@@ -586,7 +586,7 @@ export const MOCK_USERS: User[] = [
   {
     id: '27',
     name: 'Vivienne',
-    age: 54,
+    age: 34,
     distance: 27,
     bio: 'In your embrace, I\'ve discovered a world where love has no end.',
     images: [
@@ -608,7 +608,7 @@ export const MOCK_USERS: User[] = [
   {
     id: '28',
     name: 'Juliette',
-    age: 56,
+    age: 40,
     distance: 28,
     bio: 'Every moment with you feels like a scene from my favorite love story',
     images: [
@@ -630,7 +630,7 @@ export const MOCK_USERS: User[] = [
   {
     id: '29',
     name: 'Vanessa',
-    age: 57,
+    age: 44,
     distance: 29,
     bio: 'My idea of romance is simple: living life together.',
     images: [
@@ -652,7 +652,7 @@ export const MOCK_USERS: User[] = [
   {
     id: '30',
     name: 'nala',
-    age: 49,
+    age: 31,
     distance: 30,
     bio: 'I love words, sincerity, and stories told through your eyes.',
     images: [

@@ -1,35 +1,59 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { useLocation } from 'react-router-dom';
 import { MessageCircle, Send, Copy, Check } from 'lucide-react';
 import { MOCK_USERS } from '../constants';
+import { StorageManager } from '../utils/localStorage';
 
 export const MessagesPage: React.FC = () => {
+  const location = useLocation();
+  const storage = StorageManager.getInstance();
+  
+  // Get user profile and URL parameters
+  const userProfile = storage.getUserProfile();
+  const queryParams = new URLSearchParams(location.search);
+  const partnerId = queryParams.get('partnerId');
+  const issueType = queryParams.get('issue') || 'inquiry';
+  
   const [formData, setFormData] = useState({
-    name: '',
-    email: '',
-    issue: 'inquiry',
-    selectedProfile: '',
+    name: userProfile?.name || '',
+    phone: userProfile?.phone || '',
+    issue: issueType,
+    selectedProfile: partnerId || '',
     message: ''
   });
   const [copied, setCopied] = useState(false);
   const [error, setError] = useState('');
+  
+  // Prefill form when component mounts
+  useEffect(() => {
+    if (partnerId || issueType !== 'inquiry') {
+      setFormData(prev => ({
+        ...prev,
+        selectedProfile: partnerId || prev.selectedProfile,
+        issue: issueType || prev.issue,
+        name: userProfile?.name || prev.name,
+        phone: userProfile?.phone || prev.phone
+      }));
+    }
+  }, [partnerId, issueType, userProfile]);
 
   const telegramUrl = 'https://t.me/loveinthecity';
   const whatsappUrl = 'https://wa.me/1234567890';
 
-  const messagePreview = `Hi! My name is ${formData.name || 'Friend'}, email: ${formData.email || 'your@email.com'}.${
+  const messagePreview = `Hi! My name is ${formData.name || 'Friend'}.${
     formData.issue === 'reserve'
       ? ` I'm interested in ${MOCK_USERS.find(u => u.id === formData.selectedProfile)?.name || 'someone'}. ${formData.message}`
       : ` ${formData.message}`
   }`;
 
-  const copyMessage = () => {
+  const sendMessage = (platform: 'telegram' | 'whatsapp') => {
     // Validate form
     if (!formData.name.trim()) {
       setError('❌ Please enter your name');
       return;
     }
-    if (!formData.email.trim()) {
-      setError('❌ Please enter your email');
+    if (!formData.phone.trim()) {
+      setError('❌ Please enter your phone number');
       return;
     }
     if (formData.issue === 'reserve' && !formData.selectedProfile) {
@@ -38,9 +62,17 @@ export const MessagesPage: React.FC = () => {
     }
     
     setError(''); // Clear error if validation passes
+    
+    // Copy to clipboard
     navigator.clipboard.writeText(messagePreview);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
+    
+    // Open platform
+    const url = platform === 'telegram' ? telegramUrl : whatsappUrl;
+    setTimeout(() => {
+      window.open(url, '_blank');
+    }, 100);
   };
 
   return (
@@ -57,7 +89,7 @@ export const MessagesPage: React.FC = () => {
 
         {/* Contact Form */}
         <div className="bg-white rounded-2xl shadow-lg p-6 mb-6 border border-gray-200">
-          {/* Name & Email */}
+          {/* Name & Phone */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
             <div>
               <label className="text-xs font-bold text-gray-500 uppercase mb-2 block">Your Name</label>
@@ -70,12 +102,12 @@ export const MessagesPage: React.FC = () => {
               />
             </div>
             <div>
-              <label className="text-xs font-bold text-gray-500 uppercase mb-2 block">Your Email</label>
+              <label className="text-xs font-bold text-gray-500 uppercase mb-2 block">Phone Number</label>
               <input
-                type="email"
-                placeholder="your@email.com"
-                value={formData.email}
-                onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                type="tel"
+                placeholder="Your phone number..."
+                value={formData.phone}
+                onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
                 className="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:border-primary focus:bg-white focus:outline-none transition"
               />
             </div>
@@ -91,7 +123,11 @@ export const MessagesPage: React.FC = () => {
             >
               <option value="inquiry">General Inquiry</option>
               <option value="reserve">Reserve a Profile</option>
-              <option value="support">Need Help</option>
+              <option value="support">Need Help / Support</option>
+              <option value="vip">VIP Upgrade & Billing</option>
+              <option value="password">Password Reset</option>
+              <option value="verification">Account Verification</option>
+              <option value="report">Report a User</option>
             </select>
           </div>
 
@@ -125,6 +161,13 @@ export const MessagesPage: React.FC = () => {
             />
           </div>
 
+          {/* Error Message */}
+          {error && (
+            <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-xl text-red-700 text-sm font-medium">
+              {error}
+            </div>
+          )}
+
           {/* Message Preview */}
           <div className="bg-gray-50 border border-gray-200 rounded-xl p-4 mb-6">
             <p className="text-xs font-bold text-gray-500 uppercase mb-2">Your Message Preview:</p>
@@ -133,23 +176,27 @@ export const MessagesPage: React.FC = () => {
             </p>
           </div>
 
-          {/* Copy Button */}
-          <button
-            onClick={copyMessage}
-            className="w-full bg-gradient-to-r from-primary to-pink-600 text-white font-bold py-3 rounded-xl hover:shadow-lg active:scale-95 transition-all flex items-center justify-center gap-2"
-          >
-            {copied ? (
-              <>
-                <Check size={18} />
-                <span>Copied! Ready to share</span>
-              </>
-            ) : (
-              <>
-                <Copy size={18} />
-                <span>Copy Message to Clipboard</span>
-              </>
-            )}
-          </button>
+          {/* Send Buttons - Telegram & WhatsApp */}
+          <div className="grid grid-cols-2 gap-3">
+            <button
+              onClick={() => sendMessage('telegram')}
+              className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-xl active:scale-95 transition-all flex items-center justify-center gap-2"
+            >
+              <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm5.894 8.221l-1.97 9.28c-.145.658-.537.818-1.084.508l-3-2.21-1.446 1.394c-.16.16-.295.295-.605.295-.41 0-.34-.145-.477-.477l-2.09-6.881c-.135-.43-.033-.662.352-.662l9.155-3.527c.41-.126.647.104.535.617z" />
+              </svg>
+              <span className="text-sm">Telegram</span>
+            </button>
+            <button
+              onClick={() => sendMessage('whatsapp')}
+              className="bg-green-600 hover:bg-green-700 text-white font-bold py-3 rounded-xl active:scale-95 transition-all flex items-center justify-center gap-2"
+            >
+              <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.272-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.67-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.076 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421-7.403h-.004c-1.052 0-2.081.405-2.84 1.12-.78.725-1.215 1.708-1.215 2.748 0 1.486.772 2.934 2.122 3.791 1.075.67 2.631 1.123 4.001 1.123h.004c2.176 0 4.236-1.41 5.115-3.44.559-1.331.665-2.432.318-3.519-.464-1.402-1.823-2.777-3.588-3.289-.52-.15-1.061-.226-1.629-.226z" />
+              </svg>
+              <span className="text-sm">WhatsApp</span>
+            </button>
+          </div>
         </div>
 
         {/* Service Card */}

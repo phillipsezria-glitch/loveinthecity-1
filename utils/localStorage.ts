@@ -20,8 +20,10 @@ export interface StorageItem<T> {
 export interface UserProfile {
   id: string; // Unique user identifier for customer support
   name: string;
-  email: string;
-  phone: string;
+  phone?: string;
+  password?: string;
+  city?: string;
+  state?: string;
   createdAt: string; // ISO timestamp when profile was created
   lastLogin: string; // ISO timestamp of last login
   preferences: {
@@ -244,8 +246,10 @@ export class StorageManager {
     const profile: UserProfile = {
       id: existingProfile?.id || this.generateUniqueUserId(),
       name: userData.name || existingProfile?.name || 'User',
-      email: userData.email || existingProfile?.email || '',
       phone: userData.phone || existingProfile?.phone || '',
+      password: userData.password || existingProfile?.password || '',
+      city: userData.city || existingProfile?.city || '',
+      state: userData.state || existingProfile?.state || '',
       createdAt: existingProfile?.createdAt || new Date().toISOString(),
       lastLogin: new Date().toISOString(),
       preferences: {
@@ -309,7 +313,7 @@ export class StorageManager {
     if (!profile) {
       return 'User ID: Unknown | Name: Anonymous';
     }
-    return `User ID: ${profile.id} | Name: ${profile.name} | Email: ${profile.email || 'N/A'} | Created: ${new Date(profile.createdAt).toLocaleDateString()}`;
+    return `User ID: ${profile.id} | Name: ${profile.name} | Location: ${profile.city || 'N/A'}, ${profile.state || 'N/A'} | Created: ${new Date(profile.createdAt).toLocaleDateString()}`;
   }
 
   /**

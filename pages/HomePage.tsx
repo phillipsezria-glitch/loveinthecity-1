@@ -64,27 +64,6 @@ export const HomePage: React.FC = () => {
         </div>
       </div>
 
-      {/* Customer Care CTA */}
-      <div className="mx-4 mb-6">
-        <button
-          onClick={() => navigate('/messages')}
-          className="w-full bg-gradient-to-r from-primary to-pink-600 hover:from-pink-600 hover:to-primary text-white rounded-2xl p-5 shadow-xl shadow-primary/30 active:scale-95 transition-all relative overflow-hidden group"
-        >
-          <div className="absolute inset-0 bg-white/10 opacity-0 group-hover:opacity-100 transition-opacity"></div>
-          <div className="relative z-10 flex items-center justify-center space-x-3">
-            <div className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center">
-              <Send size={20} className="text-white" />
-            </div>
-            <div className="text-left">
-              <p className="font-bold text-sm">💬 Need Help?</p>
-              <p className="text-xs opacity-90">Contact Customer Care - Match with a Partner</p>
-            </div>
-            <div className="flex-1"></div>
-            <div className="text-xl font-bold">→</div>
-          </div>
-        </button>
-      </div>
-
       {/* High-end Zone */}
       <div className="mb-6 pl-4">
         <div className="flex items-center mb-3">

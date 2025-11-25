@@ -204,7 +204,7 @@ export class DeepLinkManager {
 🆔 Request ID: ${request.id}
 👤 User: ${request.userName} (${request.userId})
 📱 Issue: ${request.issueType.toUpperCase()}
-📍 Source: ${request.source}
+📍 Source: ${request.sourceType}
 ⏰ Time: ${request.timestamp}
 🔧 Session: ${request.sessionId}
 

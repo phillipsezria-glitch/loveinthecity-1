@@ -86,7 +86,7 @@ export const UserProfilePage: React.FC = () => {
       {/* Sticky Reserve Button */}
       <div className="fixed bottom-0 left-0 right-0 bg-gradient-to-t from-white via-white to-transparent pt-8 pb-4 px-4 z-30 max-w-md mx-auto">
         <button
-          onClick={() => navigate(`/messages?partnerId=${user.id}`)}
+          onClick={() => navigate(`/messages?partnerId=${user.id}&issue=reserve`)}
           className="w-full bg-gradient-to-r from-primary to-pink-600 hover:from-pink-600 hover:to-primary text-white rounded-2xl py-4 font-bold shadow-2xl shadow-primary/40 active:scale-95 transition-all flex items-center justify-center space-x-2 group"
         >
           <MessageCircle size={22} className="group-hover:rotate-12 transition-transform" />
