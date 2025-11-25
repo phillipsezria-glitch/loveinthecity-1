@@ -41,6 +41,7 @@ export default function App() {
 
 function AppContent({ isAuthenticated, setIsAuthenticated }: { isAuthenticated: boolean; setIsAuthenticated: (val: boolean) => void }) {
   const navigate = useNavigate();
+  const [mounted, setMounted] = React.useState(false);
 
   // Check authentication using StorageManager for consistency
   useEffect(() => {
@@ -56,24 +57,42 @@ function AppContent({ isAuthenticated, setIsAuthenticated }: { isAuthenticated: 
         console.log('⛔ No valid session, keeping authenticated = false');
         // Don't set to false, just let it stay false (default)
       }
+      // Mark mount as complete
+      setMounted(true);
     } catch (error) {
       console.error('Auth check error:', error);
       // On error, stay logged out (safer)
+      setMounted(true);
     }
   }, [setIsAuthenticated]);
 
   // CRITICAL: Watch for logout (isAuthenticated change) and navigate
+  // Only run AFTER initial mount to avoid redirecting on page load
   useEffect(() => {
-    if (!isAuthenticated) {
+    if (mounted && !isAuthenticated) {
       console.log('🔴 isAuthenticated is FALSE - executing navigation to /login');
       navigate('/login', { replace: true });
     }
-  }, [isAuthenticated, navigate]);
+  }, [isAuthenticated, navigate, mounted]);
 
   const handleLogin = () => {
+    console.log('🔐 LOGIN INITIATED');
     // Both methods for compatibility, but primary is StorageManager
     localStorage.setItem('funloves_token', 'mock_jwt_token');
+    const storage = require('./utils/localStorage').StorageManager.getInstance();
+    
+    // Create session (for testing - in real app this would come from server)
+    const userSession = {
+      id: 'user_' + Math.random().toString(36).substr(2, 9),
+      isAuthenticated: true,
+      loginTime: new Date().toISOString()
+    };
+    storage.set('userSession', userSession);
+    console.log('✅ Session created:', userSession.id);
+    
+    // Update auth state
     setIsAuthenticated(true);
+    console.log('✅ LOGIN COMPLETE - state updated to authenticated');
   };
 
   const handleLogout = () => {
